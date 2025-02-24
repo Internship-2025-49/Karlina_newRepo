@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import type { Context } from "hono";
-import prisma from "../../prisma/client/index.js";
+import prisma from '../../client/index.js';
+
 
 
 /**

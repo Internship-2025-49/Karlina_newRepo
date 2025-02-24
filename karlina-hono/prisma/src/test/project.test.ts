@@ -1,15 +1,7 @@
-// const express = require ('express');
-// const app = express();
+import { describe, test, expect } from "@jest/globals";
 
-// app.post('/api/person', async (req, res) =>{
-
-// });
-
-// app.get('/api/person', async (req, res) =>{
-
-// });
-
-// app.delete('/api/person', async (req, res) =>{
-
-// });
-
+describe("Sample Test", () => {
+  test("should pass", () => {
+    expect(1 + 1).toBe(2);
+  });
+});
