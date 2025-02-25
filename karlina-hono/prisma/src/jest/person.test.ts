@@ -1,26 +1,14 @@
 import { Context } from "hono";
-// import {
-//   createPerson,
-//   deletePerson,
-//   getPerson,
-//   getPersonById,
-//   updatePerson,
-// } from "../prisma/src/controllers/index.js";
+import {
+  createPerson,
+  deletePerson,
+  getPerson,
+  getPersonById,
+  updatePerson,
+} from "../../../src/controllers/PersonController";
 import { PrismaClient } from "@prisma/client/edge";
 
 const prisma = new PrismaClient();
-
-export const getPerson = async (c: Context) => {
-  try {
-    //get all posts
-    const person = await prisma.person.findMany({ orderBy: { id: "asc" } });
-    // const data = await db.select().from(Person);
-    //return JSON
-    return c.json(person);
-  } catch (e: unknown) {
-    console.error(`Error getting posts: ${e}`);
-  }
-};
 
 describe("getPerson test", () => {
   test("getPerson test", async () => {
