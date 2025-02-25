@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "target": "ESNext",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
+    "module": "EsNext",
     "strict": true,
+    "verbatimModuleSyntax": false,
     "skipLibCheck": true,
-    "baseUrl": "./",
-    "paths": {
-      "@prisma/client": ["prisma/client"]
-    }
+    "types": [
+      "node",
+      "jest"
+    ],
+    "moduleResolution": "Node",
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
   }
 }
-

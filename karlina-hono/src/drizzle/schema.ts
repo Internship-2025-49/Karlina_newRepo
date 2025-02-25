@@ -1,12 +1,16 @@
-import { int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+import {  mysqlTable, serial, varchar } from 'drizzle-orm/mysql-core';
 
-export const Person = mysqlTable('person', {
-  id: int("id").notNull().primaryKey().autoincrement(),
-  name: varchar({ length: 255 }).notNull(),
-  address: varchar({ length: 255 }).notNull(),
-  phone: varchar({ length: 255 }).notNull(),
+export const users  = mysqlTable('users', {
+    id: serial('id').primaryKey(),
+    username: varchar({ length: 255 }).notNull(),
+    name: varchar({ length: 255 }).notNull(),
+    address: varchar({ length: 255 }).notNull(),
+    phone: varchar({ length: 255 }).notNull(),
 });
 
-export const Auth = mysqlTable("auth", {
-  key: varchar("key", { length: 36 }).primaryKey(),
+export const auth = mysqlTable('auth', {
+    key: varchar({ length: 255 }),
 });
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
