@@ -1,11 +1,6 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import type { Context } from "hono";
-import prisma from "../../prisma/src/client";
-
-// import  { Person }  from "../drizzle/schema.js";
-// import { asc, eq } from "drizzle-orm";
-// import { db } from '../drizzle/index.js';
-
+import prisma from "../client/index";
 
 /**
  * Getting all posts

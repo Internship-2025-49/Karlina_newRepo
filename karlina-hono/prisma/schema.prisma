@@ -8,16 +8,16 @@ datasource db {
 }
 
 model Person {
-  id        Int      @id @default(autoincrement())
-  name     String   @db.VarChar(255)
-  address   String @db.VarChar(255)
-  phone String @db.VarChar(255)
+  id      Int    @id @default(autoincrement())
+  name    String @db.VarChar(255)
+  address String @db.VarChar(255)
+  phone   String @db.VarChar(255)
 
   @@map("person")
 }
 
 model Auth {
-  key       String   @id 
+  key String @id @db.VarChar(36)
 
-  @@map("auth")
+  @@map("auth")
 }

@@ -1,17 +1,29 @@
 import { Context } from "hono";
-import prisma from "../prisma/client";
-import { createPerson, deletePerson, getPersonById, updatePerson } from "../src/controllers/PersonController";
+import prisma from "../client";
+import { createPerson, deletePerson, getPerson, getPersonById, updatePerson } from "../controllers/PersonController";
 
 
-export const getPerson = async (c: Context) => {
-  try {
-    
-    const person = await prisma.person.findMany({ orderBy: { id: "asc" } });
-    return c.json(person);
-  } catch (e: unknown) {
-    console.error(`Error getting posts: ${e}`);
-  }
-};
+beforeAll(async () => {
+  await prisma.person.deleteMany(); 
+
+  await prisma.person.create({
+    data: { id: 1, name: "Person One", address: "Address One", phone: "1111111111" },
+  });
+
+  await prisma.person.create({
+    data: { id: 2, name: "Person Two", address: "Address Two", phone: "2222222222" },
+  });
+
+  await prisma.person.create({
+    data: { id: 3, name: "Person Three", address: "Address Three", phone: "3333333333" },
+  });
+});
+
+
+
+afterAll(async () => {
+  await prisma.$disconnect();
+});
 
 describe("getPerson test", () => {
   test("getPerson test", async () => {
@@ -37,15 +49,21 @@ describe("getPersonById test", () => {
       json: jest.fn(),
     } as unknown as Context;
 
-    const person = await prisma.person.findUnique({
-      where: { id: personId },
-    });
+    const person = await prisma.person.findUnique({ where: { id: personId } });
 
     await getPersonById(getPersonByIdTest);
 
-    expect(getPersonByIdTest.json).toHaveBeenCalledWith(person);
+    if (person) {
+      expect(getPersonByIdTest.json).toHaveBeenCalledWith(person);
+    } else {
+      expect(getPersonByIdTest.json).toHaveBeenCalledWith({
+        message: "Person Not Found!",
+        statusCode: 404,
+      });
+    }
   });
 });
+
 
 describe("createPerson test", () => {
   test("createPerson with all fields", async () => {
@@ -74,7 +92,7 @@ describe("createPerson test", () => {
 
 describe("updatePerson test", () => {
   test("updatePerson with all fields", async () => {
-    const personId = 2;
+    const personId = 2; 
     const updateTest = {
       req: {
         param: jest.fn().mockReturnValue(personId),
@@ -101,7 +119,7 @@ describe("updatePerson test", () => {
 
 describe("deletePerson test", () => {
   test("deletePerson with existing id", async () => {
-    const personId = 3;
+    const personId = 3; 
     const deleteTest = {
       req: {
         param: jest.fn().mockReturnValue(personId),

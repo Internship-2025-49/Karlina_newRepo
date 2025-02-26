@@ -1,14 +1,17 @@
-//import hono
 import { Hono } from 'hono';
-import { createPerson, deletePerson, getPerson, getPersonById, updatePerson } from '../controllers/PersonController.js';
+import { createPerson, deletePerson, getPerson, getPersonById, updatePerson } from '../controllers/PersonController';
 import { jwt } from 'hono/jwt'
 import type { JwtVariables } from 'hono/jwt'
-import prisma from '../../prisma/client/index.js';
-import { apiKeyAuth } from '../middleware/auth.js';
+import { apiKeyAuth } from '../middleware/auth';
 import { bearerAuth } from 'hono/bearer-auth';
-import { loginUser } from '../controllers/AuthController.js';
+import { loginUser } from '../controllers/AuthController';
+import { db } from '../drizzle/index.js'
 
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+import prisma from '../../prisma/src/client';
+
 dotenv.config();
 
 const SECRET_KEY: any = process.env.KEY;
@@ -29,8 +32,9 @@ app.post('/login', loginUser);
 
 app.use('/data/*', jwt({ secret: SECRET_KEY }));
 
-app.get('/shita', async (c) => {
-  const auth = await prisma.auth.findFirst()
+app.get('/tari', async (c) => {
+    // const auth = await db.query.Auth.findFirst()
+    const auth = await prisma.auth.findFirst()
   if (auth) {
       return c.json(
           { 
@@ -53,5 +57,3 @@ app.delete('/data/:id', (c) => deletePerson(c));
 
 
 export const Routes = app;
-
-
