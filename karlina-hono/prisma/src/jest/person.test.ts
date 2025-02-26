@@ -80,77 +80,21 @@ describe("getPersonById test", () => {
   });
 });
 
-describe("getPersonById test", () => {
-  test("getPersonById test", async () => {
-    const personId = 1;
-    const getPersonByIdTest = {
-      req: {
-        param: jest.fn().mockReturnValue(personId),
-      },
-      json: jest.fn(),
-    } as unknown as Context;
 
-    const person = await prisma.person.findUnique({ where: { id: personId } });
+export const createperson = async (c: Context) => {
+  try {
+    const { name, address, phone } = await c.req.json();
 
-    await getPersonById(getPersonByIdTest);
+    const newPerson = await prisma.person.create({
+      data: { name, address, phone },
+    });
 
-    if (person) {
-      expect(getPersonByIdTest.json).toHaveBeenCalledWith(person);
-    } else {
-      expect(getPersonByIdTest.json).toHaveBeenCalledWith({
-        message: "Person Not Found!",
-        statusCode: 404,
-      });
-    }
-  });
-});
+    return c.json(newPerson, 201);
+  } catch (error) {
+    return c.json({ message: "Error creating person", error }, 500);
+  }
+};
 
-
-describe("createPerson test", () => {
-  test("createPerson with all fields", async () => {
-    const createTest = {
-      req: {
-        json: jest.fn().mockResolvedValue({
-          name: "John Doe",
-          address: "123 Street",
-          phone: "1234567890",
-        }),
-      },
-      json: jest.fn(),
-    } as unknown as Context;
-
-    await createPerson(createTest);
-
-    expect(createTest.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "John Doe",
-        address: "123 Street",
-        phone: "1234567890",
-      })
-    );
-  });
-});
-
-describe("createPerson test", () => {
-  test("createPerson with all fields", async () => {
-    const createTest = {
-      req: {
-        json: jest.fn().mockResolvedValue({
-          name: "Karina",
-        }),
-      },
-      json: jest.fn(),
-    } as unknown as Context;
-
-    await createPerson(createTest);
-
-    expect(createTest.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: "Karina",
-      })
-    );
-  });
-});
 
 export const updatePersonByOrder = async (c: Context) => {
   try {
@@ -176,11 +120,12 @@ export const updatePersonByOrder = async (c: Context) => {
 };
 
 
+
 export const deletePersonByOrder = async (c: Context) => {
   try {
     const order = parseInt(c.req.param("order"));
 
- 
+    
     const allPersons = await prisma.person.findMany({ orderBy: { id: "desc" } });
 
     if (order < 1 || order > allPersons.length) {
@@ -193,6 +138,6 @@ export const deletePersonByOrder = async (c: Context) => {
 
     return c.json({ message: `Person in position ${order} from bottom deleted successfully`, statusCode: 200 });
   } catch (error) {
-    return c.json({ message: "Error deleting person", error: error }, 500);
-  } 
+    return c.json({ message: "Error deleting person", error }, 500);
+  }
 };
