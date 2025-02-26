@@ -36,7 +36,7 @@ app.post("/login", loginUser);
 
 app.use("/data/*", jwt({ secret: SECRET_KEY }));
 
-app.get("/shita", async (c) => {
+app.get("/tari", async (c) => {
   //   const auth = await prisma.auth.findFirst();
   const auth = {
     key: "",

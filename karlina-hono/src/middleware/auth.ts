@@ -1,5 +1,6 @@
 import type { Context, Next } from "hono";
-import prisma from "../../prisma/src/client/index.js";
+import prisma from "../../prisma/src/client";
+
 export const apiKeyAuth = async (c: Context, next: Next) => {
   const apiKey = c.req.header("api-key");
   if (!apiKey) {

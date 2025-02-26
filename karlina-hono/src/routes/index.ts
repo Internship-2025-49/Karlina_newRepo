@@ -1,3 +1,4 @@
+//import hono
 import { Hono } from 'hono';
 import { createPerson, deletePerson, getPerson, getPersonById, updatePerson } from '../controllers/PersonController';
 import { jwt } from 'hono/jwt'
@@ -5,14 +6,13 @@ import type { JwtVariables } from 'hono/jwt'
 import { apiKeyAuth } from '../middleware/auth';
 import { bearerAuth } from 'hono/bearer-auth';
 import { loginUser } from '../controllers/AuthController';
-import { db } from '../drizzle/index.js'
+
 
 import * as dotenv from 'dotenv';
-dotenv.config();
-
 import prisma from '../../prisma/src/client';
-
 dotenv.config();
+
+
 
 const SECRET_KEY: any = process.env.KEY;
 
@@ -54,6 +54,5 @@ app.get('/data/:id', (c) => getPersonById(c));
 app.put('/data/:id', (c) => updatePerson(c)); // Biasain pake PUT 
 app.patch('/data/:id', (c) => updatePerson(c));
 app.delete('/data/:id', (c) => deletePerson(c));
-
 
 export const Routes = app;
