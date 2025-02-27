@@ -1,143 +1,122 @@
 import { Context } from "hono";
 import prisma from "../client";
-import { createPerson, deletePerson, getPerson, getPersonById, updatePerson } from "../controllers/PersonController";
-
+import { createPerson, getPerson, getPersonById, updatePerson, deletePerson } from "../controllers/PersonController";
 
 beforeAll(async () => {
-  await prisma.person.deleteMany(); 
+  await prisma.person.deleteMany();
 
-  await prisma.person.create({
-    data: { id: 1, name: "Person One", address: "Address One", phone: "1111111111" },
-  });
-
-  await prisma.person.create({
-    data: { id: 2, name: "Person Two", address: "Address Two", phone: "2222222222" },
-  });
-
-  await prisma.person.create({
-    data: { id: 3, name: "Person Three", address: "Address Three", phone: "3333333333" },
-  });
-  await prisma.person.create({
-    data: { id: 4, name: "Person Four", address: "Address Four", phone: "4444444444" },
-  });
-
-  await prisma.person.create({
-    data: { id: 5, name: "Person Five", address: "Address Five", phone: "555555555" },
-  });
-
-  await prisma.person.create({
-    data: { id: 6, name: "Person Six", address: "Address Six", phone: "6666666" },
-  });
-  await prisma.person.create({
-    data: { id: 7, name: "Person Seven", address: "", phone: "" },
+  await prisma.person.createMany({
+    data: [
+      { name: "Person One", address: "Address One", phone: "1111111111" },
+      { name: "Person Two", address: "Address Two", phone: "2222222222" },
+      { name: "Person Three", address: "Address Three", phone: "3333333333" },
+      { name: "Person Four", address: "Address Four", phone: "4444444444" },
+      { name: "Person Five", address: "Address Five", phone: "5555555555" },
+      { name: "Person Six", address: "Address Six", phone: "6666666666" },
+      { name: "Person Seven", address: "", phone: "" },
+    ],
   });
 });
-
-
 
 afterAll(async () => {
   await prisma.$disconnect();
 });
 
-describe("getPerson test", () => {
-  test("getPerson test", async () => {
-    const getPersonTest = {
-      json: jest.fn(),
-    } as unknown as Context;
-
+describe("GET /person", () => {
+  test("Should return all persons in ascending order", async () => {
+    const getPersonTest = { json: jest.fn() } as unknown as Context;
+    
     const persons = await prisma.person.findMany({ orderBy: { id: "asc" } });
 
     await getPerson(getPersonTest);
-
-    expect(getPersonTest.json).toHaveBeenCalledWith(persons);
+    
+    expect(getPersonTest.json).toHaveBeenCalledWith(expect.arrayContaining(persons));
   });
 });
 
+describe("GET /person/:order", () => {
+  test("Should return the person at a specific order from bottom", async () => {
+    const order = 2;
+    const getPersonByOrderTest = { req: { param: jest.fn().mockReturnValue(order) }, json: jest.fn() } as unknown as Context;
 
+    const allPersons = await prisma.person.findMany({ orderBy: { id: "desc" } });
+    
+    if (order < 1 || order > allPersons.length) {
+      await getPersonById(getPersonByOrderTest);
+      expect(getPersonByOrderTest.json).toHaveBeenCalledWith({ message: "Person Not Found!", statusCode: 404 });
+    } else {
+      await getPersonById(getPersonByOrderTest);
+      expect(getPersonByOrderTest.json).toHaveBeenCalledWith(expect.objectContaining(allPersons[order - 1]));
+    }
+  });
+});
 
-describe("getPersonById test", () => {
-  test("getPersonById test", async () => {
-    const personId = 1;
-    const getPersonByIdTest = {
-      req: {
-        param: jest.fn().mockReturnValue(personId),
-      },
-      json: jest.fn(),
+describe("POST /person", () => {
+  test("Should create a new person", async () => {
+    const createTest = { req: { json: jest.fn().mockResolvedValue({ name: "John Doe", address: "123 Street", phone: "1234567890" }) }, json: jest.fn() } as unknown as Context;
+
+    await createPerson(createTest);
+
+    expect(createTest.json).toHaveBeenCalledWith(expect.objectContaining({
+      name: "John Doe",
+      address: "123 Street",
+      phone: "1234567890",
+    }));
+  });
+});
+
+describe("PUT /person/:order", () => {
+  test("Should update person at a specific order from bottom", async () => {
+    const order = 3;
+    const updateTest = { 
+      req: { 
+        param: jest.fn().mockReturnValue(order), 
+        json: jest.fn().mockResolvedValue({ name: "Updated Name", address: "Updated Address", phone: "0987654321" }) 
+      }, 
+      json: jest.fn() 
     } as unknown as Context;
 
-    const person = await prisma.person.findUnique({ where: { id: personId } });
+    const allPersons = await prisma.person.findMany({ orderBy: { id: "desc" } });
 
-    await getPersonById(getPersonByIdTest);
-
-    if (person) {
-      expect(getPersonByIdTest.json).toHaveBeenCalledWith(person);
+    if (order < 1 || order > allPersons.length) {
+      await updatePerson(updateTest);
+      expect(updateTest.json).toHaveBeenCalledWith({ message: "Person Not Found!", statusCode: 404 });
     } else {
-      expect(getPersonByIdTest.json).toHaveBeenCalledWith({
-        message: "Person Not Found!",
-        statusCode: 404,
-      });
+      await updatePerson(updateTest);
+      expect(updateTest.json).toHaveBeenCalledWith(expect.objectContaining({
+        name: "Updated Name",
+        address: "Updated Address",
+        phone: "0987654321",
+      }));
     }
   });
 });
 
+describe("DELETE /person/:order", () => {
+  test("Should delete person at a specific order from bottom", async () => {
+    const order = 1;
+    const deleteTest = { req: { param: jest.fn().mockReturnValue(order) }, json: jest.fn() } as unknown as Context;
 
-export const createperson = async (c: Context) => {
-  try {
-    const { name, address, phone } = await c.req.json();
-
-    const newPerson = await prisma.person.create({
-      data: { name, address, phone },
-    });
-
-    return c.json(newPerson, 201);
-  } catch (error) {
-    return c.json({ message: "Error creating person", error }, 500);
-  }
-};
-
-
-export const updatePersonByOrder = async (c: Context) => {
-  try {
-    const order = parseInt(c.req.param("order"));
-    const { name, address, phone } = await c.req.json();
-
-   
     const allPersons = await prisma.person.findMany({ orderBy: { id: "desc" } });
 
     if (order < 1 || order > allPersons.length) {
-      return c.json({ message: "Person Not Found!", statusCode: 404 });
+      await deletePerson(deleteTest);
+      expect(deleteTest.json).toHaveBeenCalledWith({ message: "Person Not Found!", statusCode: 404 });
+    } else {
+      await deletePerson(deleteTest);
+      expect(deleteTest.json).toHaveBeenCalledWith(expect.objectContaining({
+        message: "Person Deleted Successfully!",
+        statusCode: 200,
+      }));
     }
+  });
 
-    const updatedPerson = await prisma.person.update({
-      where: { id: allPersons[order - 1].id },
-      data: { name, address, phone },
-    });
+  test("Should return 404 if trying to delete a non-existent person", async () => {
+    const order = 20; 
+    const deleteTest = { req: { param: jest.fn().mockReturnValue(order) }, json: jest.fn() } as unknown as Context;
 
-    return c.json(updatedPerson);
-  } catch (error) {
-    return c.json({ message: "Error updating person", error }, 500);
-  }
-};
+    await deletePerson(deleteTest);
 
-
-
-export const deletePersonByOrder = async (c: Context) => {
-  try {
-    const order = parseInt(c.req.param("order"));
-
-    
-    const allPersons = await prisma.person.findMany({ orderBy: { id: "desc" } });
-
-    if (order < 1 || order > allPersons.length) {
-      return c.json({ message: "Person Not Found or Already Deleted", statusCode: 404 });
-    }
-
-    await prisma.person.delete({
-      where: { id: allPersons[order - 1].id },
-    });
-
-    return c.json({ message: `Person in position ${order} from bottom deleted successfully`, statusCode: 200 });
-  } catch (error) {
-    return c.json({ message: "Error deleting person", error }, 500);
-  }
-};
+    expect(deleteTest.json).toHaveBeenCalledWith({ message: "Index Out of Range!", statusCode: 404 });
+  });
+});

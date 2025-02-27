@@ -194,10 +194,15 @@ export async function updatePerson(c: Context) {
       data: { name, address, phone },
     });
 
-    return c.json(updatedPerson);
-  } catch (e: unknown) {
-    console.error(`Error updating person: ${e}`);
-  }
+    return c.json({
+      message: "Person updated successfully",
+      data: updatedPerson, 
+      statusCode: 200
+  });
+} catch (e) {
+  console.error(`Error updating person: ${e}`);
+  return c.json({ message: "Error updating person" }, 500);
+}
 }
 
 export async function deletePerson(c: Context) {
