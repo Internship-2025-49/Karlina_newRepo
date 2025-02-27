@@ -48,11 +48,11 @@ app.get('/tari', async (c) => {
 
 app.use('*', apiKeyAuth)
 
-app.get('/data', (c) => getPerson(c));
-app.post('/data', (c) => createPerson(c));
-app.get('/data/:id', (c) => getPersonById(c));
-app.put('/data/:id', (c) => updatePerson(c)); // Biasain pake PUT 
-app.patch('/data/:id', (c) => updatePerson(c));
-app.delete('/data/:id', (c) => deletePerson(c));
+app.get("/data", (c) => getPerson(c));
+app.post("/data", (c) => createPerson(c));
+app.get("/data/:id", (c) => getPersonById(c));
+app.put("/data/:id", (c) => updatePerson(c)); // Biasain pake PUT
+app.patch("/data/:id", (c) => updatePerson(c));
+app.delete("/data/:id", (c) => deletePerson(c));
 
 export const Routes = app;
