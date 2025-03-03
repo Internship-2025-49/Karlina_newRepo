@@ -1,16 +1,29 @@
+// {
+//   "compilerOptions": {
+//     "target": "ESNext",
+//     "module": "EsNext",
+//     "strict": true,
+//     "verbatimModuleSyntax": false,
+//     "skipLibCheck": true,
+//     "types": [
+//       "node",
+//       "jest"
+//     ],
+//     "moduleResolution": "Node",
+//     "jsx": "react-jsx",
+//     "jsxImportSource": "hono/jsx",
+//   }
+// }
+
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "EsNext",
-    "strict": true,
-    "verbatimModuleSyntax": false,
-    "skipLibCheck": true,
-    "types": [
-      "node",
-      "jest"
-    ],
+    "module": "ESNext",
     "moduleResolution": "Node",
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "target": "ESNext",
+    "allowJs": true,
+    "esModuleInterop": true
+  },
+  "ts-node": {
+    "esm": true
   }
 }
