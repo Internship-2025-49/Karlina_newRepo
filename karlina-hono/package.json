@@ -2,12 +2,14 @@
   "name": "shita-hono",
   "type": "module",
   "scripts": {
-   "dev": "tsx src/openapi/app.ts",
+    "dev": "tsx src/openapi/app.ts",
     "test": "jest"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.8",
+    "@hono/swagger-ui": "^0.5.1",
     "@hono/valibot-validator": "^0.5.2",
+    "@hono/zod-openapi": "^0.19.2",
     "@hono/zod-validator": "^0.4.3",
     "@valibot/to-json-schema": "^1.0.0-rc.0",
     "D": "^1.0.0",

@@ -1,27 +1,52 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
-import { Routes } from './routes/index.js'
-import { handle } from 'hono/vercel'
-import { cors } from 'hono/cors'
+import { serve } from "@hono/node-server";
+import { swaggerUI } from "@hono/swagger-ui";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi"; // <- add createRoute
+import { z } from "zod"; // <- add zod
 
-// Initialize the Hono app
-const app = new Hono().basePath('/api')
+const app = new OpenAPIHono();
 
-app.use('*', cors());
+// The openapi.json will be available at /doc
+app.doc("/doc", {
+    openapi: "3.0.0",
+    info: {
+        version: "1.0.0",
+        title: "My API",
+    },
+});
 
-const port = 3000
-console.log(`Server is running on http://localhost:${port}`)
+// basic route
+// ------ added code -------
+const basicRoute = createRoute({
+    method: "get",
+    path: "/basic/",
+    responses: {
+        200: {
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        hello: z.string(),
+                    }),
+                },
+            },
+            description: "say hello",
+        },
+    },
+});
+
+app.openapi(basicRoute, (c) => {
+    return c.json({ hello: "world" }, 200);
+});
+// ------ end added code -------
+
+// swagger ui doc will be available at {server url}/ui
+// fell free to change the url
+// swaggerUI url must have same path as openapi.json
+app.get("/ui", swaggerUI({ url: "/doc" }));
+
+const port = 3000;
+console.log(`Server is running on port ${port}`);
 
 serve({
-  fetch: app.fetch,
-  port
-})
-
-app.route('/person', Routes)
-
-export const GET = handle(app);
-export const POST = handle(app);
-export const PUT = handle(app);
-export const DELETE = handle(app);
-
-export default app
+    fetch: app.fetch,
+    port,
+});

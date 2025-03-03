@@ -2,11 +2,15 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { describeRoute } from 'hono-openapi';
 
+
+const port = 3000;
+
 import {
   resolver,
   validator as vValidator,
 } from 'hono-openapi/valibot';
 import { querySchema, responseSchema } from './validation.js';
+import openapi from './index';
 
 const app = new Hono();
 
@@ -31,9 +35,9 @@ app.get(
 );
 
 
-serve({
-  fetch: app.fetch,
-  port: 3000,
-});
 
-console.log("✅ Server berjalan di http://localhost:3000");
+console.log(`✅ Server berjalan di http://localhost:${port}/ui`);
+serve({
+  fetch: openapi.fetch, 
+  port,
+});
